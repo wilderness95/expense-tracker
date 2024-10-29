@@ -88,8 +88,13 @@ public class CategoryService {
                 );
     }
 
-    @Transactional
     public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto) {
+        Category existingCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> {
+                    log.error("Failed to update category, because category with id {} does not exist...", categoryId);
+                    return new CategoryNotFoundException("Category with ID " + categoryId + " not found.");
+                });
+
         try {
             Category category = categoryMapper.toEntity(categoryDto);
             category.setId(categoryId);
@@ -98,12 +103,10 @@ public class CategoryService {
             return categoryMapper.toDto(updatedCategory);
 
         } catch (DataIntegrityViolationException e) {
-        log.error("Failed to update category. Category with name '{}' already exists.", categoryDto.getName());
-        throw new CategoryExistsException("Category with name '" + categoryDto.getName() + "' already exists.");
-    } catch (EntityNotFoundException e) {
-        log.error("Failed to update category, because category with id {} does not exist...", categoryId);
-        throw new CategoryNotFoundException("Category not found.");
+            log.error("Failed to update category. Category with name '{}' already exists.", categoryDto.getName());
+            throw new CategoryExistsException("Category with name '" + categoryDto.getName() + "' already exists.");
+        }
     }
-    }
+
 }
 
