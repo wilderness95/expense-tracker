@@ -6,7 +6,6 @@ import hu.wilderness.expensetracker.exceptions.CategoryExistsException;
 import hu.wilderness.expensetracker.exceptions.CategoryNotFoundException;
 import hu.wilderness.expensetracker.model.Category;
 import hu.wilderness.expensetracker.repository.CategoryRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,7 +34,7 @@ public class CategoryService {
                 .map(categoryMapper::toDto)
                 .collect(Collectors.toList());
     }
-    public CategoryDto getCategoryById(long categoryId){
+    public CategoryDto getCategoryById(Long categoryId){
         Category category = categoryRepository
                 .findById(categoryId)
                 .orElseThrow(()-> {
@@ -57,9 +56,9 @@ public class CategoryService {
 
     public CategoryDto addNewCategory(CategoryDto categoryDto) {
         try{
-        Category category = categoryMapper.toEntity(categoryDto);
-        Category newCategory = categoryRepository.save(category);
-        return categoryMapper.toDto(newCategory);
+            Category category = categoryMapper.toEntity(categoryDto);
+            Category newCategory = categoryRepository.save(category);
+            return categoryMapper.toDto(newCategory);
         } catch (DataIntegrityViolationException e){
             log.error("Category already exists...");
             throw new CategoryExistsException("Category already exists");
@@ -75,19 +74,26 @@ public class CategoryService {
                 });
         categoryRepository.deleteById(categoryId);
     }
-    public void deleteCategoriesdByName(String name) {
-            categoryRepository.findByName(name).ifPresent(categoryRepository::delete);
-    }
-    public void deleteCategoriesByName(String categoryName) {
-        categoryRepository.findByName(categoryName).ifPresentOrElse(
-                categoryRepository::delete,
-                () -> {
-                    log.error("Category with name {} not found", categoryName);
-                    throw new CategoryNotFoundException(String.format("Category with name %s not found", categoryName));
-                }
+    public void deleteCategoriesByName(List<String> categoryNames) {
+        for (String categoryName : categoryNames) {
+            try {
+                categoryRepository.findByName(categoryName).ifPresentOrElse(
+                        category -> {
+                            categoryRepository.delete(category);
+                            log.info("Successfully deleted category with name '{}'.", categoryName);
+                        },
+                        () -> {
+                            log.warn("Category with name '{}' not found, skipping deletion.", categoryName);
+                            throw new CategoryNotFoundException("Category with name '" + categoryName + "' not found.");
+                        }
                 );
+            } catch (CategoryNotFoundException e) {
+                log.error("Failed to delete category '{}': {}", categoryName, e.getMessage());
+            }
+        }
     }
 
+    @Transactional
     public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto) {
         Category existingCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> {

@@ -47,14 +47,14 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCategoryById(@PathVariable Long id) {
+    public ResponseEntity<String> deleteCategoryById(@PathVariable Long id) {
         categoryService.deleteCategoryById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.OK).body("Category deleted successfully.");
     }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<?> deleteCategoriesByName(@PathVariable String name) {
-        categoryService.deleteCategoriesByName(name);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/deleteByNames")
+    public ResponseEntity<String> deleteCategoriesByNames(@RequestBody List<String> categoryNames) {
+        categoryService.deleteCategoriesByName(categoryNames);
+        return ResponseEntity.status(HttpStatus.OK).body("Categories deleted successfully.");
     }
 }

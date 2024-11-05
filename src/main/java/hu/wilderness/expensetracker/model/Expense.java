@@ -17,10 +17,10 @@ public class Expense {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long expenseId;
+    private Long expenseId;
     @NotEmpty
     private String expenseName;
-    private long categoryId;
+    private Long categoryId;
     private String expenseDescription;
     @Min(1)
     private int amount;

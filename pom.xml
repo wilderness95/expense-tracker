@@ -34,7 +34,7 @@
         <pmd.version>3.25.0</pmd.version>
         <spotbugs.version>4.8.6.2</spotbugs.version>
         <checkstyle.version>3.5.0</checkstyle.version>
-        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+        <org.mapstruct.version>1.6.2</org.mapstruct.version>
     </properties>
     <dependencies>
         <dependency>
@@ -74,6 +74,11 @@
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
         </dependency>
+        <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-processor</artifactId>
+        <version>${org.mapstruct.version}</version>
+    </dependency>
     </dependencies>
 
     <build>

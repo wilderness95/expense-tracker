@@ -7,9 +7,9 @@ import java.time.LocalDate;
 
 @Data
 public class ExpenseDto {
-    private long expenseId;
+    private Long expenseId;
     private String expenseName;
-    private long categoryId;
+    private Long categoryId;
     private String expenseDescription;
     private int amount;
     private LocalDate createDate;
